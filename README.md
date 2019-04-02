@@ -54,4 +54,4 @@ X value is 0.365931
 - With O3, **at::mt19937** randoms with **at::uniform_real_distribution** is the fastest.
 - PyTorch builds with -O2, so it would just make sense to go with std. However, std::uniform_real_distribution
 suffers with numbers not being in the range [0,1) - http://open-std.org/JTC1/SC22/WG21/docs/lwg-active.html#2524.
-That limits us to use our custom at::uniform_real_distribution. Hence, we are going with at::mt19937+at::uniform_real_distribution. Morevoer, std::mt19937 can't be seeded properly (std::seed_seq is biased, and using a single 32-bit is not recommended: http://www.pcg-random.org/posts/cpp-seeding-surprises.html). std::mt19937 probably should have a constructor that can take a user supplied array, or std::seed_seq might need to be looked at as suggested by the article.
+That limits us to use our custom at::uniform_real_distribution. Hence, we are going with at::mt19937+at::uniform_real_distribution.
