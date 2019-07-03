@@ -7,6 +7,7 @@
 #endif
 
 #include <stdint.h>
+#include "splitmix64.h"
 
 #include "Array.h"
 #include <cmath>
@@ -76,6 +77,10 @@ public:
     incr_n(offset);
   }
 
+  void print4(const UINT4& v) {
+      printf("%08x %08x %08x %08x\n", v[0], v[1], v[2], v[3]);
+  }
+
   /**
    * Produces a unique 32-bit pseudo random number on every invocation
    */
@@ -83,32 +88,58 @@ public:
     if(STATE == 0) {
       UINT4 counter_ = counter;
       UINT2 key_ = key;
-      
-      counter_ = single_round(counter_, key_);
-      key_[0] += (kPhilox10A); key_[1] += (kPhilox10B);
-      counter_ = single_round(counter_, key_);
-      key_[0] += (kPhilox10A); key_[1] += (kPhilox10B);
-      counter_ = single_round(counter_, key_);
-      key_[0] += (kPhilox10A); key_[1] += (kPhilox10B);
-      counter_ = single_round(counter_, key_);
-      key_[0] += (kPhilox10A); key_[1] += (kPhilox10B);
-      counter_ = single_round(counter_, key_);
-      key_[0] += (kPhilox10A); key_[1] += (kPhilox10B);
-      counter_ = single_round(counter_, key_);
-      key_[0] += (kPhilox10A); key_[1] += (kPhilox10B);
-      counter_ = single_round(counter_, key_);
-      key_[0] += (kPhilox10A); key_[1] += (kPhilox10B);
-      counter_ = single_round(counter_, key_);
-      key_[0] += (kPhilox10A); key_[1] += (kPhilox10B);
-      counter_ = single_round(counter_, key_);
-      key_[0] += (kPhilox10A); key_[1] += (kPhilox10B);
 
+      counter_ = single_round(counter_, key_);
+      key_[0] += (kPhilox10A); key_[1] += (kPhilox10B);
+      counter_ = single_round(counter_, key_);
+      key_[0] += (kPhilox10A); key_[1] += (kPhilox10B);
+      counter_ = single_round(counter_, key_);
+      key_[0] += (kPhilox10A); key_[1] += (kPhilox10B);
+      counter_ = single_round(counter_, key_);
+      key_[0] += (kPhilox10A); key_[1] += (kPhilox10B);
+      counter_ = single_round(counter_, key_);
+      key_[0] += (kPhilox10A); key_[1] += (kPhilox10B);
+      counter_ = single_round(counter_, key_);
+      key_[0] += (kPhilox10A); key_[1] += (kPhilox10B);
+      counter_ = single_round(counter_, key_);
+      key_[0] += (kPhilox10A); key_[1] += (kPhilox10B);
+      counter_ = single_round(counter_, key_);
+      key_[0] += (kPhilox10A); key_[1] += (kPhilox10B);
+      counter_ = single_round(counter_, key_);
+      key_[0] += (kPhilox10A); key_[1] += (kPhilox10B);
       output = single_round(counter_, key_);
       incr();
     }
     uint32_t ret = output[STATE];
     STATE = (STATE + 1) & 3;
     return ret;
+  }
+
+  inline UINT4 next() {
+    UINT4 counter_ = counter;
+    UINT2 key_ = key;
+    
+    counter_ = single_round(counter_, key_);
+    key_[0] += (kPhilox10A); key_[1] += (kPhilox10B);
+    counter_ = single_round(counter_, key_);
+    key_[0] += (kPhilox10A); key_[1] += (kPhilox10B);
+    counter_ = single_round(counter_, key_);
+    key_[0] += (kPhilox10A); key_[1] += (kPhilox10B);
+    counter_ = single_round(counter_, key_);
+    key_[0] += (kPhilox10A); key_[1] += (kPhilox10B);
+    counter_ = single_round(counter_, key_);
+    key_[0] += (kPhilox10A); key_[1] += (kPhilox10B);
+    counter_ = single_round(counter_, key_);
+    key_[0] += (kPhilox10A); key_[1] += (kPhilox10B);
+    counter_ = single_round(counter_, key_);
+    key_[0] += (kPhilox10A); key_[1] += (kPhilox10B);
+    counter_ = single_round(counter_, key_);
+    key_[0] += (kPhilox10A); key_[1] += (kPhilox10B);
+    counter_ = single_round(counter_, key_);
+    key_[0] += (kPhilox10A); key_[1] += (kPhilox10B);
+    counter_ = single_round(counter_, key_);
+    incr();
+    return counter_;
   }
 
   /**
@@ -148,14 +179,13 @@ public:
    * Function that Skips one 128 bit number in a subsequence
    */
   inline void incr() {
-    if (++counter[0])
-      return;
-    if (++counter[1])
-      return;
-    if (++counter[2]) {
-      return;
+    if (++counter[0] == 0) {
+      if (++counter[1] == 0) {
+        if (++counter[2] == 0) {
+          ++counter[3];
+        }
+      }
     }
-    ++counter[3];
   }
 
 private:
@@ -181,6 +211,7 @@ private:
     uint32_t hi1;
     uint32_t lo0 = mulhilo32(kPhiloxSA, ctr[0], &hi0);
     uint32_t lo1 = mulhilo32(kPhiloxSB, ctr[2], &hi1);
+    // printf("lohi %08x %08x %08x %08x\n", lo0, hi0, lo1, hi1);
     UINT4 ret;
     ret[0] = hi1 ^ ctr[1] ^ key[0];
     ret[1] = lo1;
