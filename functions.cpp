@@ -71,7 +71,7 @@ void check_philox_vs_simd() {
 
 void philox_simd(uint64_t loop_count = 1000000000UL) {
     at::philox_simd_engine gen(0,0,0);
-    __m256i v;
+    __m256i v = _mm256_set1_epi32(0);
     benchmark("philox_simd", loop_count, 1024, [&]{
         __m256i a, b, c, d;
         gen.next32(a, b, c, d);
