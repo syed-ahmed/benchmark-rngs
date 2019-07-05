@@ -1,6 +1,6 @@
 # Benchmark for PyTorch
 
-`benchmark.cpp` benchmarks `Philox.h`, `MT19937.h` and `std::mt19937`.
+`benchmark.cpp` benchmarks `Philox.h`, `PhiloxSIMD.h` `xoshiro256starstar.h`, `pcg64.h` and `std::mt19937`.
 
 Build and run with the following instructions:
 ```
