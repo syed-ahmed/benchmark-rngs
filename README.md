@@ -1,6 +1,6 @@
-# Benchmark for PyTorch [PR#16604](https://github.com/pytorch/pytorch/pull/16604)
+# Random Number Engine Benchmark
 
-`benchmark.cpp` benchmarks `Philox.h`, `MT19937.h` and `std::mt19937`.
+`benchmark.cpp` benchmarks `Philox.h`, `MT19937.h`, `PCG.h` and `std::mt19937`.
 
 Build and run with the following instructions:
 ```
@@ -47,11 +47,3 @@ X value is 0.365931
 Time to get 100000000 std::mt19937 randoms with at::uniform_real_distribution = 0.461688s
 X value is 0.365931
 ```
-
-# Conclusion:
-- Without any optimizations, **std::mt19937** randoms with **at::uniform_real_distribution** is the fastest.
-- With O2, **std::mt19937** randoms with **std::uniform_real_distribution** is the fastest.
-- With O3, **at::mt19937** randoms with **at::uniform_real_distribution** is the fastest.
-- PyTorch builds with -O2, so it would just make sense to go with std. However, std::uniform_real_distribution
-suffers with numbers not being in the range [0,1) - http://open-std.org/JTC1/SC22/WG21/docs/lwg-active.html#2524.
-That limits us to use our custom at::uniform_real_distribution. Hence, we are going with at::mt19937+at::uniform_real_distribution.
