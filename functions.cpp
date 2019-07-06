@@ -1,5 +1,6 @@
 #include "Philox.h"
 #include "MT19937.h"
+#include "PCG.h"
 #include <iostream>
 #include <random>
 #include <chrono>
@@ -40,6 +41,19 @@ void at_mt19937(uint64_t loop_count = 1000000000UL) {
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> diff = end-start;
     std::cout << "Time to get " << loop_count << " at::mt19937 randoms with at::uniform_real_distribution = " << diff.count() << "s" << std::endl;
+    std::cout << "X value is " << x << std::endl;
+}
+
+void at_pcg(uint64_t loop_count = 1000000000UL) {
+    float x = 0;
+    at::pcg gen1;
+    auto start = std::chrono::high_resolution_clock::now();
+    for(uint64_t i = 0; i < loop_count; i++) {
+        x = to_float_from_uint(gen1());
+    }
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> diff = end-start;
+    std::cout << "Time to get " << loop_count << " at::pcg randoms with at::uniform_real_distribution = " << diff.count() << "s" << std::endl;
     std::cout << "X value is " << x << std::endl;
 }
 
