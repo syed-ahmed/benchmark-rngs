@@ -1,49 +1,28 @@
 # Random Number Engine Benchmark
 
-`benchmark.cpp` benchmarks `Philox.h`, `MT19937.h`, `PCG.h` and `std::mt19937`.
+`benchmark.cpp` benchmarks `Philox.h`, `PhiloxSIMD.h` `xoshiro256starstar.h`, `pcg64.h` and `std::mt19937`
 
 Build and run with the following instructions:
 ```
-g++ --std=c++11 -c -O3 -o funcs.o functions.cpp
-g++ --std=c++11 -c -O3 -o main.o benchmark.cpp
-g++ -o bench main.o funcs.o
+g++ --std=c++11 -O3 -march=native functions.cpp benchmark.cpp -lm -o bench
 ./bench
 
 ```
 
 # Results:
-Benchmarked on DGX systems with Intel Xeons, G++ 5.4.0.
-#### without any optimizations
-```
-Time to get 100000000 philox randoms with at::uniform_real_distribution = 10.0938s
-X value is 0.128836
-Time to get 100000000 at::mt19937 randoms with at::uniform_real_distribution = 2.29676s
-X value is 0.365931
-Time to get 100000000 std::mt19937 randoms with std::uniform_real_distribution = 13.9122s
-X value is 0.365931
-Time to get 100000000 std::mt19937 randoms with at::uniform_real_distribution = 1.92397s
-X value is 0.365931
-```
-
-#### with -O2
-```
-Time to get 100000000 philox randoms with at::uniform_real_distribution = 0.462759s
-X value is 0.128836
-Time to get 100000000 at::mt19937 randoms with at::uniform_real_distribution = 0.39628s
-X value is 0.365931
-Time to get 100000000 std::mt19937 randoms with std::uniform_real_distribution = 0.352087s
-X value is 0.365931
-Time to get 100000000 std::mt19937 randoms with at::uniform_real_distribution = 0.419454s
-X value is 0.365931
-```
+Benchmarked on Intel(R) Xeon(R) CPU E5-2698 v4 @ 2.20GHz with GCC 7.3.0
 #### with -O3
 ```
-Time to get 100000000 philox randoms with at::uniform_real_distribution = 0.479021s
-X value is 0.128836
-Time to get 100000000 at::mt19937 randoms with at::uniform_real_distribution = 0.320545s
-X value is 0.365931
-Time to get 100000000 std::mt19937 randoms with std::uniform_real_distribution = 0.393593s
-X value is 0.365931
-Time to get 100000000 std::mt19937 randoms with at::uniform_real_distribution = 0.461688s
-X value is 0.365931
+Time to get 100000000 philox randoms = 0.271853s
+Y value is 3011083429
+Time to get 100000000 philox_simd randoms = 0.117607s
+Y value is 3011083429
+Time to get 100000000 xoshiro256** randoms = 0.0561525s
+Y value is 2135289733523560858
+Time to get 100000000 pcg64 randoms = 0.0990407s
+Y value is 18182947979635078005
+Time to get 100000000 at::mt19937 randoms = 0.235999s
+Y value is 3753120473
+Time to get 100000000 std::mt19937 randoms = 0.195286s
+Y value is 3753120473
 ```

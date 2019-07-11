@@ -21,7 +21,7 @@ public:
     pcg32_random_r();
   }
 
-  inline uint32_t operator()() {
+  inline uint64_t operator()() {
       return pcg32_random_r();
   }
 
