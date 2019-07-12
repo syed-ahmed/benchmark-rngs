@@ -99,7 +99,7 @@ int main(int argc, char **argv){
         }
         results_table << fort::endr;
 
-        for(int i = 5; i < 13; i++) {
+        for(int i = 1; i < 10; i++) {
             auto num_randoms = 1 << 3*i;
             results_table << std::to_string(num_randoms);
             run_benchmark_suite(results_table, m, num_randoms, num_threads);

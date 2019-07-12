@@ -45,6 +45,7 @@ g++ --std=c++11 -O3 -pthread -march=native fort.c functions.cpp benchmark.cpp -l
 | 64                | 0.390613    | 0.758192 | 0.450836        | 0.192623              | 0.048729             | 0.022513                   | 1.293453     | 0.799838     |
 | 128               | 0.388140    | 0.581354 | 0.501050        | 0.176927              | 0.050463             | 0.023684                   | 1.289084     | 0.784333     |
 
+<img alt="varying-threads" src="imgs/varying-threads.png">
 
 ### Benchmark with varying number of randoms:
 ```
@@ -63,3 +64,5 @@ g++ --std=c++11 -O3 -pthread -march=native fort.c functions.cpp benchmark.cpp -l
 | 2097152           | 0.009726    | 0.014331 | 0.011185        | 0.005075              | 0.010168             | 0.004162                   | 0.024855     | 0.011402     |
 | 16777216          | 0.048210    | 0.078647 | 0.108818        | 0.047557              | 0.053539             | 0.041094                   | 0.184866     | 0.089420     |
 | 134217728         | 0.373109    | 0.635907 | 0.442864        | 0.179401              | 0.385669             | 0.187484                   | 1.395175     | 0.761713     |
+
+<img alt="varying-randoms" src="imgs/varying-randoms.png">
