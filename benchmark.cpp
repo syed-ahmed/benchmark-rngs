@@ -87,7 +87,7 @@ int main(int argc, char **argv){
             run_benchmark_suite(results_table, m, loop_count, thread_count);
         }
         std::cout << std::endl;
-        std::cout << "Summary: " << "Time (seconds) to get " + std::to_string(loop_count) + " randoms with " + std::to_string(num_threads) + " threads" << std::endl;
+        std::cout << "Summary: " << "Time (seconds) to get " + std::to_string(loop_count) + " randoms with varying number of threads" << std::endl;
     } else if (benchmark_increasing_loop_count) {
         if((num_threads & (num_threads - 1)) != 0){
             throw std::runtime_error("Number of threads must be a power of 2");
@@ -99,7 +99,7 @@ int main(int argc, char **argv){
         }
         results_table << fort::endr;
 
-        for(int i = 1; i < 10; i++) {
+        for(int i = 5; i < 13; i++) {
             auto num_randoms = 1 << 3*i;
             results_table << std::to_string(num_randoms);
             run_benchmark_suite(results_table, m, num_randoms, num_threads);
