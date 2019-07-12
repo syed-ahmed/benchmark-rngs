@@ -45,6 +45,8 @@ g++ --std=c++11 -O3 -pthread -march=native fort.c functions.cpp benchmark.cpp -l
 | 64                | 0.006355    | 0.010718 | 0.009138        | 0.004014              | 0.004396             | 0.001159                   | 0.022163     | 0.010612     |
 | 128               | 0.006836    | 0.011050 | 0.007864        | 0.003755              | 0.002533             | 0.001835                   | 0.021781     | 0.014806     |
 
+<img alt="varying-threads-1" src="imgs/varying-thread-1.png">
+
 #### Summary: Time (seconds) to get 16777216 randoms with varying number of threads
 | Number of Threads | at::mt19937 |  pcg64   | philox (global) | philox (thread local) | philox_simd (global) | philox_simd (thread local) | std::mt19937 | xoshiro256** |
 |-------------------|-------------|----------|-----------------|-----------------------|----------------------|----------------------------|--------------|--------------|
@@ -57,6 +59,7 @@ g++ --std=c++11 -O3 -pthread -march=native fort.c functions.cpp benchmark.cpp -l
 | 64                | 0.048237    | 0.091597 | 0.069750        | 0.024603              | 0.013414             | 0.004334                   | 0.172353     | 0.098655     |
 | 128               | 0.049436    | 0.084217 | 0.055882        | 0.024117              | 0.012299             | 0.007503                   | 0.168072     | 0.080855     |
 
+<img alt="varying-threads-2" src="imgs/varying-thread-2.png">
 
 #### Summary: Time (seconds) to get 134217728 randoms with varying number of threads
 | Number of Threads | at::mt19937 |  pcg64   | philox (global) | philox (thread local) | philox_simd (global) | philox_simd (thread local) | std::mt19937 | xoshiro256** |
@@ -70,7 +73,7 @@ g++ --std=c++11 -O3 -pthread -march=native fort.c functions.cpp benchmark.cpp -l
 | 64                | 0.390613    | 0.758192 | 0.450836        | 0.192623              | 0.048729             | 0.022513                   | 1.293453     | 0.799838     |
 | 128               | 0.388140    | 0.581354 | 0.501050        | 0.176927              | 0.050463             | 0.023684                   | 1.289084     | 0.784333     |
 
-<img alt="varying-threads" src="imgs/varying-threads.png">
+<img alt="varying-threads-3" src="imgs/varying-thread-3.png">
 
 ### Benchmark with varying number of randoms:
 ```
