@@ -41,7 +41,7 @@ static void benchmark(const char* name, uint64_t loop_count, const func_t& f, ui
         std::chrono::duration<double> diff = end - start;
         best = std::min(best, diff.count());
     }
-    std::cout << "Time to get " << loop_count << " " << name << " randoms, with " << num_threads << " thread(s) = " << best << "s" << std::endl;
+    std::cout << "Time to get " << loop_count << " " << name << " randoms, with " << num_threads << " thread(s) = " << best << " s" << std::endl;
 }
 
 void check_philox_vs_simd() {
