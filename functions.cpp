@@ -41,7 +41,7 @@ static void benchmark(const char* name, uint64_t loop_count, const func_t& f, ui
         std::chrono::duration<double> diff = end - start;
         best = std::min(best, diff.count());
     }
-    std::cout << "Time to get " << loop_count << " " << name << " randoms per thread, with " << num_threads << " thread(s) = " << best << "s" << std::endl;
+    std::cout << "Time to get " << loop_count << " " << name << " randoms, with " << num_threads << " thread(s) = " << best << "s" << std::endl;
 }
 
 void check_philox_vs_simd() {
@@ -62,14 +62,14 @@ void check_philox_vs_simd() {
     }
 }
 
-void philox_global_instance(uint64_t loop_count = 1000000000UL, uint64_t num_threads=1) {
+void philox_global_instance(uint64_t loop_count = 134217728UL, uint64_t num_threads=1) {
     uint32_t y = 0;
     at::philox_engine gen1(0,0,0);
     std::mutex mutex;
     uint64_t step = 128 / 32;
     benchmark("philox (global instance)", loop_count, [&] (uint64_t thread_idx, int trial) {
         std::lock_guard<std::mutex> lock(mutex);
-        for(uint64_t i = 0; i < loop_count; i+=step) {
+        for(uint64_t i = 0; i < loop_count / num_threads; i+=step) {
             auto z = gen1.next();
             y += z[0];
             y += z[1];
@@ -80,12 +80,12 @@ void philox_global_instance(uint64_t loop_count = 1000000000UL, uint64_t num_thr
     std::cout << "Accumulated Y value is " << y << std::endl;
 }
 
-void philox_thread_local_instance(uint64_t loop_count = 1000000000UL, uint64_t num_threads=1) {
+void philox_thread_local_instance(uint64_t loop_count = 134217728UL, uint64_t num_threads=1) {
     uint64_t step = 128 / 32;
     benchmark("philox (thread local instance)", loop_count, [&] (uint64_t thread_idx, int trial) {
         uint32_t y = 0;
         at::philox_engine gen1(0, thread_idx, 0);
-        for(uint64_t i = 0; i < loop_count; i+=step) {
+        for(uint64_t i = 0; i < loop_count / num_threads; i+=step) {
             auto z = gen1.next();
             y += z[0];
             y += z[1];
@@ -98,14 +98,14 @@ void philox_thread_local_instance(uint64_t loop_count = 1000000000UL, uint64_t n
     }, num_threads);
 }
 
-void philox_simd_global_instance(uint64_t loop_count = 1000000000UL, uint64_t num_threads=1) {
+void philox_simd_global_instance(uint64_t loop_count = 134217728UL, uint64_t num_threads=1) {
     at::philox_simd_engine gen(0,0,0);
     std::mutex mutex;
     __m256i v = _mm256_set1_epi32(0);
     uint64_t step = 1024 / 32;
     benchmark("philox_simd (global instance)", loop_count, [&] (uint64_t thread_idx, int trial) {
         std::lock_guard<std::mutex> lock(mutex);
-        for(uint64_t i = 0; i < loop_count; i+=step) {
+        for(uint64_t i = 0; i < loop_count / num_threads; i+=step) {
             __m256i a, b, c, d;
             gen.next32(a, b, c, d);
             v = _mm256_add_epi32(v, a);
@@ -123,12 +123,12 @@ void philox_simd_global_instance(uint64_t loop_count = 1000000000UL, uint64_t nu
     std::cout << "Accumulated Y value is " << y << std::endl;
 }
 
-void philox_simd_thread_local_instance(uint64_t loop_count = 1000000000UL, uint64_t num_threads=1) {
+void philox_simd_thread_local_instance(uint64_t loop_count = 134217728UL, uint64_t num_threads=1) {
     uint64_t step = 1024 / 32;
     benchmark("philox_simd (thread local instance)", loop_count, [&] (uint64_t thread_idx, int trial) {
         __m256i v = _mm256_set1_epi32(0);
         at::philox_simd_engine gen(0, thread_idx, 0);
-        for(uint64_t i = 0; i < loop_count; i+=step) {
+        for(uint64_t i = 0; i < loop_count / num_threads; i+=step) {
             __m256i a, b, c, d;
             gen.next32(a, b, c, d);
             v = _mm256_add_epi32(v, a);
@@ -148,14 +148,14 @@ void philox_simd_thread_local_instance(uint64_t loop_count = 1000000000UL, uint6
     }, num_threads);
 }
 
-void xoshiro256(uint64_t loop_count = 1000000000UL, uint64_t num_threads=1) {
+void xoshiro256(uint64_t loop_count = 134217728UL, uint64_t num_threads=1) {
     uint64_t y = 0;
     xoshiro256starstar_engine gen1(0);
     std::mutex mutex;
     uint64_t step = 64 / 32;
     benchmark("xoshiro256**", loop_count, [&] (uint64_t thread_idx, int trial) {
         std::lock_guard<std::mutex> lock(mutex);
-        for(uint64_t i = 0; i < loop_count; i+=step) {
+        for(uint64_t i = 0; i < loop_count / num_threads; i+=step) {
             uint64_t z = gen1.next();
             y += z;
         }
@@ -163,42 +163,42 @@ void xoshiro256(uint64_t loop_count = 1000000000UL, uint64_t num_threads=1) {
     std::cout << "Accumulated Y value is " << y << std::endl;
 }
 
-void at_pcg(uint64_t loop_count = 1000000000UL, uint64_t num_threads=1) {
+void at_pcg(uint64_t loop_count = 134217728UL, uint64_t num_threads=1) {
     uint64_t y = 0;
     at::pcg gen1;
     std::mutex mutex;
     uint64_t step = 64 / 32;
     benchmark("pcg64", loop_count, [&] (uint64_t thread_idx, int trial) {
         std::lock_guard<std::mutex> lock(mutex);
-        for(uint64_t i = 0; i < loop_count; i+=step) {
+        for(uint64_t i = 0; i < loop_count / num_threads; i+=step) {
             y += gen1();
         }
     }, num_threads);
     std::cout << "Accumulated Y value is " << y << std::endl;
 }
 
-void at_mt19937(uint64_t loop_count = 1000000000UL, uint64_t num_threads=1) {
+void at_mt19937(uint64_t loop_count = 134217728UL, uint64_t num_threads=1) {
     uint32_t y = 0;
     at::mt19937 gen1;
     std::mutex mutex;
     uint64_t step = 32 / 32;
     benchmark("at::mt19937", loop_count, [&] (uint64_t thread_idx, int trial) {
         std::lock_guard<std::mutex> lock(mutex);
-        for(uint64_t i = 0; i < loop_count; i+=step) {
+        for(uint64_t i = 0; i < loop_count / num_threads; i+=step) {
             y += gen1();
         }
     }, num_threads);
     std::cout << "Accumulated Y value is " << y << std::endl;
 }
 
-void std_mt19937(uint64_t loop_count = 1000000000UL, uint64_t num_threads=1) {
+void std_mt19937(uint64_t loop_count = 134217728UL, uint64_t num_threads=1) {
     uint32_t y = 0;
     std::mt19937 gen1;
     std::mutex mutex;
     uint64_t step = 32 / 32;
     benchmark("std::mt19937", loop_count, [&] (uint64_t thread_idx, int trial) {
         std::lock_guard<std::mutex> lock(mutex);
-        for(uint64_t i = 0; i < loop_count; i+=step) {
+        for(uint64_t i = 0; i < loop_count / num_threads; i+=step) {
             y += gen1();
         }
     }, num_threads);

@@ -10,6 +10,7 @@
 #include <limits>
 #include <stdint.h>
 #include <x86intrin.h>
+#include <stdexcept>
 
 using namespace at;
 
@@ -26,12 +27,15 @@ void check_philox_vs_simd();
 
 int main(int argc, char **argv){
     CLI::App app{"Random Number Engine Benchmark"};
-    auto loop_count = 100000000UL;
+    auto loop_count = 134217728UL;
     auto num_threads = 1;
-    app.add_option("-l,--loop-count", loop_count, "Number of randoms to produce per thread");
+    app.add_option("-l,--loop-count", loop_count, "Number of randoms to produce");
     app.add_option("-t,--num-threads", num_threads, "Number of threads");
     CLI11_PARSE(app, argc, argv);
 
+    if(loop_count % num_threads != 0){
+        throw std::runtime_error("Number of randoms to produce has to be divisible by number of threads");
+    }
     // check_philox_vs_simd();  // NOTE: must set UNSHUFFLE to 1 for generators to match exactly
 
     philox_global_instance(loop_count, num_threads);
