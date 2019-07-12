@@ -1,12 +1,22 @@
 # Random Number Engine Benchmark
 
-`benchmark.cpp` benchmarks `Philox.h`, `PhiloxSIMD.h` `xoshiro256starstar.h`, `pcg64.h` and `std::mt19937`
+`benchmark.cpp` benchmarks `Philox.h`, `PhiloxSIMD.h` `xoshiro256starstar.h`, `PCG.h` and `std::mt19937`
 
 Build and run with the following instructions:
 ```
-g++ --std=c++11 -O3 -march=native functions.cpp benchmark.cpp -lm -o bench
+g++ --std=c++11 -O3 -pthread -march=native functions.cpp benchmark.cpp -lm -o bench
 ./bench
+./bench --num-threads 5
+```
 
+# Usage:
+```
+Usage: ./bench [OPTIONS]
+
+Options:
+  -h,--help                   Print this help message and exit
+  -l,--loop-count UINT        Number of randoms to produce per thread
+  -t,--num-threads INT        Number of threads
 ```
 
 # Results:
