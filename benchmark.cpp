@@ -68,7 +68,7 @@ int main(int argc, char **argv){
     m.emplace("std::mt19937", &std_mt19937);
 
     fort::table results_table;
-    std::cout << "Benchmarking with 30 trials. Reduce TRIALS in functions.cpp if running too slow." << std::endl;
+    std::cout << "Benchmarking with 3 trials. Modify TRIALS in functions.cpp if needed." << std::endl;
     if (benchmark_increasing_threads) {
         if((loop_count & (loop_count - 1)) != 0){
             throw std::runtime_error("Number of randoms must be a power of 2");
