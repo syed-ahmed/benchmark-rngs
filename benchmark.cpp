@@ -78,7 +78,7 @@ int main(int argc, char **argv){
     }
 
     CLI::App app{"Random Number Engine Benchmark"};
-    auto num_randoms = 134217728UL;
+    uint64_t num_randoms = 134217728UL;
     auto num_threads = 1;
     auto max_num_x_data = 9;
     std::vector<uint32_t> engine_index;
@@ -124,7 +124,7 @@ int main(int argc, char **argv){
         for(int i = 0; i < max_num_x_data; i++) {
             // shuffle when sampling new number of threads
             std::shuffle(m.begin(), m.end(), g);
-            auto thread_count = 1 << i;
+            auto thread_count = 1ULL << i;
             x_data.emplace_back(std::make_pair(num_randoms, thread_count));
             run_benchmark_suite(m, num_randoms, thread_count);
         }
@@ -139,9 +139,9 @@ int main(int argc, char **argv){
         for(int i = 1; i <= max_num_x_data; i++) {
             // shuffle when sampling new number of randoms
             std::shuffle(m.begin(), m.end(), g);
-            auto num_randoms = 1 << 3*i;
-            x_data.emplace_back(std::make_pair(num_randoms, num_threads));
-            run_benchmark_suite(m, num_randoms, num_threads);
+            uint64_t num_randoms_inc = 1ULL << 3*i;
+            x_data.emplace_back(std::make_pair(num_randoms_inc, num_threads));
+            run_benchmark_suite(m, num_randoms_inc, num_threads);
         }
         std::cout << std::endl;
         std::cout << "Copy-paste the following in a markdown page for better readability" << std::endl;
@@ -168,7 +168,7 @@ int main(int argc, char **argv){
 
     results_table_avg << fort::header;
     results_table_avg << "Number of Randoms" << "Number of Threads";
-    file << "Number of Randoms,Number of Threads";
+    file << std::fixed << std::setprecision(12) << "Number of Randoms,Number of Threads";
     for (auto const& x : m) {
         auto test_name = std::get<0>(x);
         results_table_avg << test_name + " [best avg (s)]" << test_name + " [worst avg (s)]";
@@ -177,12 +177,12 @@ int main(int argc, char **argv){
     file << "\n";
     results_table_avg << fort::endr;
     for(uint64_t i = 0; i < x_data.size(); i++) {
-        results_table_avg << std::to_string(x_data[i].first) << std::to_string(x_data[i].second);
-        file << std::to_string(x_data[i].first) << ","  << std::to_string(x_data[i].second);
+        results_table_avg << x_data[i].first << x_data[i].second;
+        file << x_data[i].first << ","  << x_data[i].second;
         for (auto const& x : m) {
             auto y_data = std::get<2>(x);
-            results_table_avg << std::to_string(std::get<0>(y_data[i])) << std::to_string(std::get<1>(y_data[i]));
-            file << "," << std::to_string(std::get<0>(y_data[i])) << "," << std::to_string(std::get<1>(y_data[i]));
+            results_table_avg << std::get<0>(y_data[i]) << std::get<1>(y_data[i]);
+            file << "," << std::get<0>(y_data[i]) << "," << std::get<1>(y_data[i]);
         }
         results_table_avg << fort::endr;
         file << "\n";
@@ -201,7 +201,7 @@ int main(int argc, char **argv){
 
     results_table_max << fort::header;
     results_table_max << "Number of Randoms" << "Number of Threads";
-    file << "Number of Randoms,Number of Threads";
+    file << std::fixed << std::setprecision(12) << "Number of Randoms,Number of Threads";
     for (auto const& x : m) {
         auto test_name = std::get<0>(x);
         results_table_max << test_name + " [best max (s)]" << test_name + " [worst max (s)]";
@@ -210,12 +210,12 @@ int main(int argc, char **argv){
     file << "\n";
     results_table_max << fort::endr;
     for(uint64_t i = 0; i < x_data.size(); i++) {
-        results_table_max << std::to_string(x_data[i].first) << std::to_string(x_data[i].second);
-        file << std::to_string(x_data[i].first) << ","  << std::to_string(x_data[i].second);
+        results_table_max << x_data[i].first << x_data[i].second;
+        file << x_data[i].first << ","  << x_data[i].second;
         for (auto const& x : m) {
             auto y_data = std::get<2>(x);
-            results_table_max << std::to_string(std::get<2>(y_data[i])) << std::to_string(std::get<3>(y_data[i]));
-            file << "," << std::to_string(std::get<2>(y_data[i])) << "," << std::to_string(std::get<3>(y_data[i]));
+            results_table_max << std::get<2>(y_data[i]) << std::get<3>(y_data[i]);
+            file << "," << std::get<2>(y_data[i]) << "," << std::get<3>(y_data[i]);
         }
         results_table_max << fort::endr;
         file << "\n";

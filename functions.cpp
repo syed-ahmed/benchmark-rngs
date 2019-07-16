@@ -14,7 +14,6 @@
 #include <string>
 #include <cstring>
 
-constexpr int MAX_THREADS = 1024;
 constexpr int TRIALS = 3;
 constexpr float POW_2_32_INV = 1.0f / std::numeric_limits<uint32_t>::max();
 
@@ -183,8 +182,8 @@ std::tuple<double, double, double, double> philox_simd_global_instance(std::stri
     std::mutex mutex;
     uint64_t step = 1024 / 32;
 
-    __m256i y[MAX_THREADS];
-    memset(y, 0, sizeof(y[0]) * MAX_THREADS);
+    __m256i y[num_threads];
+    memset(y, 0, sizeof(y[0]) * num_threads);
     auto bench = benchmark(name, loop_count, [&](uint64_t thread_idx) {
         __m256i a, b, c, d;
         __m256i v = _mm256_set1_epi32(0);
@@ -219,8 +218,8 @@ std::tuple<double, double, double, double> philox_simd_global_instance(std::stri
 std::tuple<double, double, double, double> philox_simd_thread_local_instance(std::string name, uint64_t loop_count = 134217728UL, uint64_t num_threads = 1)
 {
     uint64_t step = 1024 / 32;
-    __m256i y[MAX_THREADS];
-    memset(y, 0, sizeof(y[0]) * MAX_THREADS);
+    __m256i y[num_threads];
+    memset(y, 0, sizeof(y[0]) * num_threads);
     std::vector<at::philox_simd_engine> engines;
     for (uint64_t i = 0; i < num_threads; ++i)
     {
@@ -474,8 +473,8 @@ std::tuple<double, double, double, double> philox_simd_global_instance_chunking(
     std::mutex mutex;
     uint64_t step = 1024 / 32;
 
-    __m256i y[MAX_THREADS];
-    memset(y, 0, sizeof(y[0]) * MAX_THREADS);
+    __m256i y[num_threads];
+    memset(y, 0, sizeof(y[0]) * num_threads);
     auto bench = benchmark(name, loop_count, [&](uint64_t thread_idx) {
         __m256i a, b, c, d;
         __m256i v = _mm256_set1_epi32(0);
