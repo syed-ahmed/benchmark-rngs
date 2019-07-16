@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 2.8)
+project(RNGBenchmark)
+set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -pthread -march=native -lm")
+message("CMAKE_BUILD_TYPE is ${CMAKE_BUILD_TYPE}")
+add_executable(bench fort.c functions.cpp benchmark.cpp)

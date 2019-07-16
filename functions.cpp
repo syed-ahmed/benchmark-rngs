@@ -57,7 +57,7 @@ static std::tuple<double, double, double, double> benchmark(std::string name, ui
     {
         std::vector<std::thread> threads;
 
-        for (int i = 0; i < num_threads; ++i)
+        for (uint64_t i = 0; i < num_threads; ++i)
         {
             threads.push_back(std::thread(timed_func, i));
         }
@@ -154,7 +154,7 @@ std::tuple<double, double, double, double> philox_thread_local_instance(std::str
     std::vector<uint32_t> y(num_threads, 0);
     uint64_t step = 128 / 32;
     std::vector<at::philox_engine> engines;
-    for (int i = 0; i < num_threads; ++i) {
+    for (uint64_t i = 0; i < num_threads; ++i) {
         engines.emplace_back(0, i, 0);
     }
     auto bench = benchmark(name, loop_count, [&](uint64_t thread_idx) {
@@ -203,7 +203,7 @@ std::tuple<double, double, double, double> philox_simd_global_instance(std::stri
 
     uint32_t x = 0;
     uint32_t values[8];
-    for (int j = 0; j < num_threads; ++j)
+    for (uint64_t j = 0; j < num_threads; ++j)
     {
         _mm256_storeu_si256((__m256i *)values, y[j]);
         for (int i = 0; i < 8; i++)
@@ -222,7 +222,7 @@ std::tuple<double, double, double, double> philox_simd_thread_local_instance(std
     __m256i y[MAX_THREADS];
     memset(y, 0, sizeof(y[0]) * MAX_THREADS);
     std::vector<at::philox_simd_engine> engines;
-    for (int i = 0; i < num_threads; ++i)
+    for (uint64_t i = 0; i < num_threads; ++i)
     {
         engines.emplace_back(0, i, 0);
     }
@@ -244,7 +244,7 @@ std::tuple<double, double, double, double> philox_simd_thread_local_instance(std
                            num_threads);
     uint32_t x = 0;
     uint32_t values[8];
-    for (int j = 0; j < num_threads; ++j)
+    for (uint64_t j = 0; j < num_threads; ++j)
     {
         _mm256_storeu_si256((__m256i *)values, y[j]);
         for (int i = 0; i < 8; i++)
@@ -264,7 +264,7 @@ std::tuple<double, double, double, double> xoshiro256(std::string name, uint64_t
     std::mutex mutex;
     uint64_t step = 64 / 32;
     auto bench = benchmark(name, loop_count, [&](uint64_t thread_idx) {
-        uint64_t z;
+        uint64_t z = 0;
         std::lock_guard<std::mutex> lock(mutex);
         for (uint64_t i = 0; i < loop_count / num_threads; i += step)
         {
@@ -285,7 +285,7 @@ std::tuple<double, double, double, double> at_pcg(std::string name, uint64_t loo
     std::mutex mutex;
     uint64_t step = 64 / 32;
     auto bench = benchmark(name, loop_count, [&](uint64_t thread_idx) {
-        uint64_t z;
+        uint64_t z = 0;
         std::lock_guard<std::mutex> lock(mutex);
         for (uint64_t i = 0; i < loop_count / num_threads; i += step)
         {
@@ -306,7 +306,7 @@ std::tuple<double, double, double, double> at_mt19937(std::string name, uint64_t
     std::mutex mutex;
     uint64_t step = 32 / 32;
     auto bench = benchmark(name, loop_count, [&](uint64_t thread_idx) {
-        uint32_t z;
+        uint32_t z = 0;
         std::lock_guard<std::mutex> lock(mutex);
         for (uint64_t i = 0; i < loop_count / num_threads; i += step)
         {
@@ -327,7 +327,7 @@ std::tuple<double, double, double, double> std_mt19937(std::string name, uint64_
     std::mutex mutex;
     uint64_t step = 32 / 32;
     auto bench = benchmark(name, loop_count, [&](uint64_t thread_idx) {
-        uint32_t z;
+        uint32_t z = 0;
         std::lock_guard<std::mutex> lock(mutex);
         for (uint64_t i = 0; i < loop_count / num_threads; i += step)
         {
