@@ -38,6 +38,12 @@ std::tuple<double, double, double, double> at_mt19937(std::string name, uint64_t
 std::tuple<double, double, double, double> at_pcg(std::string name, uint64_t num_randoms, uint64_t num_threads);
 std::tuple<double, double, double, double> std_mt19937(std::string name, uint64_t num_randoms, uint64_t num_threads);
 std::tuple<double, double, double, double> xoshiro256(std::string name, uint64_t num_randoms, uint64_t num_threads);
+std::tuple<double, double, double, double> at_mt19937_chunking(std::string name, uint64_t num_randoms, uint64_t num_threads);
+std::tuple<double, double, double, double> at_pcg_chunking(std::string name, uint64_t num_randoms, uint64_t num_threads);
+std::tuple<double, double, double, double> std_mt19937_chunking(std::string name, uint64_t num_randoms, uint64_t num_threads);
+std::tuple<double, double, double, double> xoshiro256_chunking(std::string name, uint64_t num_randoms, uint64_t num_threads);
+std::tuple<double, double, double, double> philox_global_instance_chunking(std::string name, uint64_t num_randoms, uint64_t num_threads);
+std::tuple<double, double, double, double> philox_simd_global_instance_chunking(std::string name, uint64_t num_randoms, uint64_t num_threads);
 void check_philox_vs_simd();
 
 void run_benchmark_suite(benchmarks_map_t& benchmarks, uint64_t num_randoms, uint64_t num_threads) {
@@ -58,6 +64,12 @@ int main(int argc, char **argv){
     tests_registry.emplace_back(std::make_tuple("pcg64", &at_pcg, y_data_t()));
     tests_registry.emplace_back(std::make_tuple("at::mt19937", &at_mt19937, y_data_t()));
     tests_registry.emplace_back(std::make_tuple("std::mt19937", &std_mt19937, y_data_t()));
+    tests_registry.emplace_back(std::make_tuple("at::mt19937 (chunking)", &at_mt19937_chunking, y_data_t()));
+    tests_registry.emplace_back(std::make_tuple("pcg64 (chunking)", &at_pcg_chunking, y_data_t()));
+    tests_registry.emplace_back(std::make_tuple("std::mt19937 (chunking)", &std_mt19937_chunking, y_data_t()));
+    tests_registry.emplace_back(std::make_tuple("xoshiro256** (chunking)", &xoshiro256_chunking, y_data_t()));
+    tests_registry.emplace_back(std::make_tuple("philox (global) (chunking)", &philox_global_instance_chunking, y_data_t()));
+    tests_registry.emplace_back(std::make_tuple("philox_simd (global) (chunking)", &philox_simd_global_instance_chunking, y_data_t()));
 
     std::string engine_index_help_string = "Selects specific tests to run by supplying an int. Runs with all tests if none provided.\nAvailable tests are:";
     for(int i = 0; i < tests_registry.size(); ++i) {

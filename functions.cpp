@@ -340,3 +340,172 @@ std::tuple<double, double, double, double> std_mt19937(std::string name, uint64_
     std::cout << "Accumulated Y value is " << x << std::endl;
     return bench;
 }
+
+std::tuple<double, double, double, double> xoshiro256_chunking(std::string name, uint64_t loop_count = 134217728UL, uint64_t num_threads = 1)
+{
+    std::vector<uint64_t> y(num_threads, 0);
+    xoshiro256starstar_engine gen1(0);
+    std::mutex mutex;
+    uint64_t step = 64 / 32;
+    auto bench = benchmark(name, loop_count, [&](uint64_t thread_idx) {
+        uint64_t z = 0;
+        for (uint64_t i = 0; i < (loop_count / num_threads)>>20; i += step)
+        {
+            std::lock_guard<std::mutex> lock(mutex);
+            for(int k = 0; k < 1<<20; k++)
+            { 
+                z += gen1.next();
+            }
+        }
+        y[thread_idx] = z;
+    },
+                           num_threads);
+    uint64_t x = std::accumulate(y.begin(), y.end(), 0);
+    std::cout << "Accumulated Y value is " << x << std::endl;
+    return bench;
+}
+
+std::tuple<double, double, double, double> at_pcg_chunking(std::string name, uint64_t loop_count = 134217728UL, uint64_t num_threads = 1)
+{
+    std::vector<uint64_t> y(num_threads, 0);
+    at::pcg gen1;
+    std::mutex mutex;
+    uint64_t step = 64 / 32;
+    auto bench = benchmark(name, loop_count, [&](uint64_t thread_idx) {
+        uint64_t z = 0;
+        for (uint64_t i = 0; i < (loop_count / num_threads)>>20; i += step)
+        {
+            std::lock_guard<std::mutex> lock(mutex);
+            for(int k = 0; k < 1<<20; k++)
+            {
+                z += gen1();
+            }
+        }
+        y[thread_idx] = z;
+    },
+                           num_threads);
+    uint64_t x = std::accumulate(y.begin(), y.end(), 0);
+    std::cout << "Accumulated Y value is " << x << std::endl;
+    return bench;
+}
+
+std::tuple<double, double, double, double> at_mt19937_chunking(std::string name, uint64_t loop_count = 134217728UL, uint64_t num_threads = 1)
+{
+    std::vector<uint32_t> y(num_threads, 0);
+    at::mt19937 gen1;
+    std::mutex mutex;
+    uint64_t step = 32 / 32;
+    auto bench = benchmark(name, loop_count, [&](uint64_t thread_idx) {
+        uint32_t z = 0;
+        for (uint64_t i = 0; i < (loop_count / num_threads)>>20; i += step)
+        {
+            std::lock_guard<std::mutex> lock(mutex);
+            for(int k = 0; k < 1<<20; k++)
+            {
+                z += gen1();
+            }
+        }
+        y[thread_idx] = z;
+    },
+                           num_threads);
+    uint32_t x = std::accumulate(y.begin(), y.end(), 0);
+    std::cout << "Accumulated Y value is " << x << std::endl;
+    return bench;
+}
+
+std::tuple<double, double, double, double> std_mt19937_chunking(std::string name, uint64_t loop_count = 134217728UL, uint64_t num_threads = 1)
+{
+    std::vector<uint32_t> y(num_threads, 0);
+    std::mt19937 gen1;
+    std::mutex mutex;
+    uint64_t step = 32 / 32;
+    auto bench = benchmark(name, loop_count, [&](uint64_t thread_idx) {
+        uint32_t z = 0;
+        for (uint64_t i = 0; i < (loop_count / num_threads)>>20; i += step)
+        {
+            std::lock_guard<std::mutex> lock(mutex);
+            for(int k = 0; k < 1<<20; k++)
+            {
+                z = gen1();
+            }
+        }
+        y[thread_idx] = z;
+    },
+                           num_threads);
+    uint32_t x = std::accumulate(y.begin(), y.end(), 0);
+    std::cout << "Accumulated Y value is " << x << std::endl;
+    return bench;
+}
+
+std::tuple<double, double, double, double> philox_global_instance_chunking(std::string name, uint64_t loop_count = 134217728UL, uint64_t num_threads = 1)
+{
+    std::vector<uint32_t> y(num_threads, 0);
+    at::philox_engine gen1(0, 0, 0);
+    std::mutex mutex;
+    uint64_t step = 128 / 32;
+    auto bench = benchmark(name, loop_count, [&](uint64_t thread_idx) {
+        uint32_t local = 0;
+        at::detail::Array<uint32_t, 4> z;
+        for (uint64_t i = 0; i < (loop_count / num_threads)>>20; i += step)
+        {
+            std::lock_guard<std::mutex> lock(mutex);
+            for(int k = 0; k < 1<<20; k++)
+            {
+                z = gen1.next();
+
+                local += z[0];
+                local += z[1];
+                local += z[2];
+                local += z[3];
+            }
+        }
+
+        y[thread_idx] = local;
+    },
+                           num_threads);
+    uint32_t x = std::accumulate(y.begin(), y.end(), 0);
+    std::cout << "Accumulated Y value is " << x << std::endl;
+    return bench;
+}
+
+std::tuple<double, double, double, double> philox_simd_global_instance_chunking(std::string name, uint64_t loop_count = 134217728UL, uint64_t num_threads = 1)
+{
+    at::philox_simd_engine gen(0, 0, 0);
+    std::mutex mutex;
+    uint64_t step = 1024 / 32;
+
+    __m256i y[MAX_THREADS];
+    memset(y, 0, sizeof(y[0]) * MAX_THREADS);
+    auto bench = benchmark(name, loop_count, [&](uint64_t thread_idx) {
+        __m256i a, b, c, d;
+        __m256i v = _mm256_set1_epi32(0);
+        for (uint64_t i = 0; i < (loop_count / num_threads)>>20; i += step)
+        {
+            std::lock_guard<std::mutex> lock(mutex);
+            for(int k = 0; k < 1<<20; k++)
+            {
+                gen.next32(a, b, c, d);
+                v = _mm256_add_epi32(v, a);
+                v = _mm256_add_epi32(v, b);
+                v = _mm256_add_epi32(v, c);
+                v = _mm256_add_epi32(v, d);
+            }
+        }
+        y[thread_idx] = v;
+    },
+                           num_threads);
+
+    uint32_t x = 0;
+    uint32_t values[8];
+    for (uint64_t j = 0; j < num_threads; ++j)
+    {
+        _mm256_storeu_si256((__m256i *)values, y[j]);
+        for (int i = 0; i < 8; i++)
+        {
+            x += values[i];
+        }
+    }
+
+    std::cout << "Accumulated Y value is " << x << std::endl;
+    return bench;
+}
