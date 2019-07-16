@@ -22,6 +22,7 @@
 #include <random>
 #include <algorithm>
 #include <iterator>
+#include <fstream>
 
 using namespace at;
 
@@ -72,7 +73,7 @@ int main(int argc, char **argv){
     tests_registry.emplace_back(std::make_tuple("philox_simd (global) (chunking)", &philox_simd_global_instance_chunking, y_data_t()));
 
     std::string engine_index_help_string = "Selects specific tests to run by supplying an int. Runs with all tests if none provided.\nAvailable tests are:";
-    for(int i = 0; i < tests_registry.size(); ++i) {
+    for(uint64_t i = 0; i < tests_registry.size(); ++i) {
         engine_index_help_string += "\n{" + std::to_string(i) + ": " + std::get<0>(tests_registry[i]) + "}";
     }
 
@@ -80,7 +81,7 @@ int main(int argc, char **argv){
     auto num_randoms = 134217728UL;
     auto num_threads = 1;
     auto max_num_x_data = 9;
-    std::vector<int> engine_index;
+    std::vector<uint32_t> engine_index;
 
     auto benchmark_metric = app.add_option_group("benchmark_type", 
                                                  "Decides if the independent variable is number of threads or number of randoms");
@@ -114,11 +115,12 @@ int main(int argc, char **argv){
 
     std::cout << "Benchmarking with 3 trials. Modify TRIALS in functions.cpp if needed." << std::endl;
     x_data_t x_data;
+    std::string file_name("result");
     if (benchmark_increasing_threads->count() > 0) {
         if((num_randoms == 0) || (num_randoms & (num_randoms - 1)) != 0){
             throw std::runtime_error("Number of randoms must be a power of 2");
         }
-        
+        file_name += "-increasing-threads";
         for(int i = 0; i < max_num_x_data; i++) {
             // shuffle when sampling new number of threads
             std::shuffle(m.begin(), m.end(), g);
@@ -133,7 +135,7 @@ int main(int argc, char **argv){
         if((num_threads == 0) || (num_threads & (num_threads - 1)) != 0){
             throw std::runtime_error("Number of threads must be a power of 2");
         }
-
+        file_name += "-increasing-randoms";
         for(int i = 1; i <= max_num_x_data; i++) {
             // shuffle when sampling new number of randoms
             std::shuffle(m.begin(), m.end(), g);
@@ -159,47 +161,66 @@ int main(int argc, char **argv){
 
     std::cout << "##### Best and Worst Average Times per Thread" << std::endl;
 
-    // print summary
+    // print summary, write to file
     fort::table results_table_avg;
+    std::ofstream file;
+    file.open(file_name+"-avg.txt", std::ofstream::out | std::ofstream::trunc);
+
     results_table_avg << fort::header;
     results_table_avg << "Number of Randoms" << "Number of Threads";
+    file << "Number of Randoms,Number of Threads";
     for (auto const& x : m) {
         auto test_name = std::get<0>(x);
         results_table_avg << test_name + " [best avg (s)]" << test_name + " [worst avg (s)]";
+        file << "," << test_name + " [best avg (s)]," << test_name + " [worst avg (s)]";
     }
+    file << "\n";
     results_table_avg << fort::endr;
-    for(auto i = 0; i < x_data.size(); i++) {
+    for(uint64_t i = 0; i < x_data.size(); i++) {
         results_table_avg << std::to_string(x_data[i].first) << std::to_string(x_data[i].second);
+        file << std::to_string(x_data[i].first) << ","  << std::to_string(x_data[i].second);
         for (auto const& x : m) {
             auto y_data = std::get<2>(x);
             results_table_avg << std::to_string(std::get<0>(y_data[i])) << std::to_string(std::get<1>(y_data[i]));
+            file << "," << std::to_string(std::get<0>(y_data[i])) << "," << std::to_string(std::get<1>(y_data[i]));
         }
         results_table_avg << fort::endr;
+        file << "\n";
     }
+    file.close();
 
     // table format
     results_table_avg.row(0).set_cell_text_align(fort::text_align::center);
     std::cout << results_table_avg.to_string() << std::endl;
-
+    
     std::cout << "##### Best and Worst Max Times" << std::endl;
 
-    // print summary
+    // print summary, write to file
     fort::table results_table_max;
+    file.open(file_name+"-max.txt", std::ofstream::out | std::ofstream::trunc);
+
     results_table_max << fort::header;
     results_table_max << "Number of Randoms" << "Number of Threads";
+    file << "Number of Randoms,Number of Threads";
     for (auto const& x : m) {
         auto test_name = std::get<0>(x);
         results_table_max << test_name + " [best max (s)]" << test_name + " [worst max (s)]";
+        file << "," << test_name + " [best max (s)]," << test_name + " [worst max (s)]";
     }
+    file << "\n";
     results_table_max << fort::endr;
-    for(auto i = 0; i < x_data.size(); i++) {
+    for(uint64_t i = 0; i < x_data.size(); i++) {
         results_table_max << std::to_string(x_data[i].first) << std::to_string(x_data[i].second);
+        file << std::to_string(x_data[i].first) << ","  << std::to_string(x_data[i].second);
         for (auto const& x : m) {
             auto y_data = std::get<2>(x);
             results_table_max << std::to_string(std::get<2>(y_data[i])) << std::to_string(std::get<3>(y_data[i]));
+            file << "," << std::to_string(std::get<2>(y_data[i])) << "," << std::to_string(std::get<3>(y_data[i]));
         }
         results_table_max << fort::endr;
+        file << "\n";
     }
+    file.close();
 
     // table format
     results_table_max.row(0).set_cell_text_align(fort::text_align::center);
