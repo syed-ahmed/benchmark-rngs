@@ -65,12 +65,12 @@ int main(int argc, char **argv){
     tests_registry.emplace_back(std::make_tuple("pcg64", &at_pcg, y_data_t()));
     tests_registry.emplace_back(std::make_tuple("at::mt19937", &at_mt19937, y_data_t()));
     tests_registry.emplace_back(std::make_tuple("std::mt19937", &std_mt19937, y_data_t()));
-    tests_registry.emplace_back(std::make_tuple("at::mt19937 (chunking)", &at_mt19937_chunking, y_data_t()));
-    tests_registry.emplace_back(std::make_tuple("pcg64 (chunking)", &at_pcg_chunking, y_data_t()));
-    tests_registry.emplace_back(std::make_tuple("std::mt19937 (chunking)", &std_mt19937_chunking, y_data_t()));
-    tests_registry.emplace_back(std::make_tuple("xoshiro256** (chunking)", &xoshiro256_chunking, y_data_t()));
-    tests_registry.emplace_back(std::make_tuple("philox (global) (chunking)", &philox_global_instance_chunking, y_data_t()));
-    tests_registry.emplace_back(std::make_tuple("philox_simd (global) (chunking)", &philox_simd_global_instance_chunking, y_data_t()));
+    // tests_registry.emplace_back(std::make_tuple("at::mt19937 (chunking)", &at_mt19937_chunking, y_data_t()));
+    // tests_registry.emplace_back(std::make_tuple("pcg64 (chunking)", &at_pcg_chunking, y_data_t()));
+    // tests_registry.emplace_back(std::make_tuple("std::mt19937 (chunking)", &std_mt19937_chunking, y_data_t()));
+    // tests_registry.emplace_back(std::make_tuple("xoshiro256** (chunking)", &xoshiro256_chunking, y_data_t()));
+    // tests_registry.emplace_back(std::make_tuple("philox (global) (chunking)", &philox_global_instance_chunking, y_data_t()));
+    // tests_registry.emplace_back(std::make_tuple("philox_simd (global) (chunking)", &philox_simd_global_instance_chunking, y_data_t()));
 
     std::string engine_index_help_string = "Selects specific tests to run by supplying an int. Runs with all tests if none provided.\nAvailable tests are:";
     for(uint64_t i = 0; i < tests_registry.size(); ++i) {
