@@ -90,12 +90,12 @@ sudo i7z
 ```
 ### Step 2: Run benchmark
 ```
-# benchmarks with varying number of threads, get 10 
-./bench -a
+# benchmarks with varying number of threads, and 10 data points 
+./bench -a -x 11
 # benchmarks with varying number of randoms
-./bench -b
+./bench -b -x 11
 # benchmark a subset of engines
-./bench -e 0 1 -a
+./bench -e 0 1 -a -x 11
 ```
 ### Step 3: Copy results to result folder
 ```
